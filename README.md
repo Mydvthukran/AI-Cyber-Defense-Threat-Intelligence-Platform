@@ -1,68 +1,126 @@
 # AI Cyber Defense Threat Intelligence Platform
 
-A mini SOC/SIEM-style platform inspired by tools like Splunk, CrowdStrike, Elastic SIEM, and IBM QRadar.
+A simple SOC/SIEM-style cybersecurity project to capture traffic, detect threats, visualize attacks, and optionally respond automatically.
 
-## Project Goal
-Build an end-to-end cyber defense platform that can:
+## Project Flow (Simple)
 
-- Collect logs from systems and services
-- Analyze suspicious activity
-- Detect potential attacks with rule-based + ML approaches
-- Visualize threats in real time
-- Trigger alerts and optional auto-response actions
+### 1) Network Traffic Comes In
+Traffic enters from websites, logins, downloads/uploads, and API calls.
+
+- Packet capture tools: **Wireshark**, **Suricata**
+- Packets are treated as small data messages moving across the network
+
+### 2) Traffic Monitoring
+The system watches packets in real time and checks:
+
+- Source/destination IPs
+- Ports and protocols
+- Packet/request type
+- Request frequency
+
+Examples:
+- Normal browsing ✅
+- 500 login attempts in 1 minute 🚨
+- Port scanning behavior 🚨
+
+### 3) Threat Detection Engine
+Two detection methods work together:
+
+**A. Rule-Based Detection (Snort/Suricata rules)**
+- Example: if failed login attempts exceed threshold → trigger alert
+
+**B. AI/ML Detection**
+- Learns normal behavior and flags anomalies
+- Example: normal user ~20 requests/min vs attacker ~2000 requests/min
+
+### 4) Alert Generation
+When suspicious activity is detected:
+
+- Dashboard shows warning
+- Admin gets notification
+- Logs are stored for investigation
+
+Common alerts:
+- Port scan detected
+- Brute-force attack detected
+- Suspicious IP activity
+- Malware-like traffic pattern
+
+### 5) Visualization Dashboard
+Frontend displays live security status:
+
+- Attack graphs
+- Traffic charts
+- Attacker IP list
+- Threat severity
+- Real-time event logs
+
+Suggested stack: **React + Chart.js**
+
+### 6) Auto Response (Advanced)
+Optional automated actions:
+
+- Block IPs
+- Rate-limit/stop abusive requests
+- Isolate suspicious traffic
+
+Example: too many requests from one IP → auto-blacklist.
+
+### 7) Honeypot (Advanced)
+Deploy a fake vulnerable target to study attackers safely.
+
+- Suggested tool: **Cowrie**
+- Captures attacker behavior, commands, and patterns for threat intelligence
+
+## Very Simple Architecture
+
+```text
+Network Traffic
+      ↓
+Packet Capture
+      ↓
+Threat Detection Engine
+      ↓
+AI Analysis + Security Rules
+      ↓
+Alerts + Logs
+      ↓
+Dashboard Visualization
+      ↓
+Auto Response / Blocking
+```
+
+## Roles (Short)
+
+- **SOC Analyst**: monitors dashboard, validates alerts, escalates incidents.
+- **Security Engineer**: writes/tunes detection rules, manages Suricata/Snort, response policies.
+- **ML Engineer**: builds and improves anomaly detection models.
+- **Backend Engineer**: builds ingestion APIs, detection orchestration, alert services.
+- **Frontend Engineer**: develops dashboard, charts, and live incident views.
+- **DevOps/Platform Engineer**: deployment, scaling, logging pipeline, reliability.
+
+## Requirements (Short)
+
+### Core Tools
+- Packet capture/IDS: Wireshark, Suricata (and/or Snort rules)
+- Honeypot (optional): Cowrie
+- Frontend: React, Chart.js
+- Backend/ML stack (recommended): Python + FastAPI + scikit-learn
+
+### Infrastructure
+- Linux environment for network tooling
+- Local lab/test network for safe attack simulation
+- Database/log storage (e.g., PostgreSQL/Elasticsearch) for alerts and history
+
+### Safety
+- Run attack simulations only in authorized lab environments.
+- Never test offensive techniques on public or unauthorized systems.
 
 ## Repository Structure
 
 ```text
 AI-Cyber-Defense-Threat-Intelligence-Platform/
 ├── backend/
-│   └── .gitkeep
 ├── frontend/
-│   └── .gitkeep
 └── README.md
 ```
-
-## Planned Components
-
-### Frontend
-- React dashboard
-- Real-time threat feed
-- Severity charts and trends
-- Alert panel and suspicious IP tracking
-
-### Backend
-- FastAPI (recommended) or Node.js + Express
-- Log/event ingestion APIs
-- Detection orchestration and alert management
-- WebSocket endpoints for live updates
-
-### ML Layer
-- Python + scikit-learn/pandas/numpy
-- Initial models: Isolation Forest, Random Forest, Logistic Regression
-- Initial use cases: brute-force detection, abnormal login attempts, DDoS-like spikes
-
-### Data & Search
-- PostgreSQL for users, alerts, and history
-- Elasticsearch for large-scale log search and analytics
-
-## High-Level Architecture
-
-1. Simulated/real traffic generates logs
-2. Collectors send events to the backend
-3. Backend stores events and invokes detection logic
-4. Detection results are pushed to frontend in real time
-5. Optional response engine blocks malicious activity
-
-## Suggested Development Roadmap
-
-1. **Phase 1:** Basic ingestion + dashboard
-2. **Phase 2:** Real-time updates and alerting
-3. **Phase 3:** ML-based anomaly detection
-4. **Phase 4:** Honeypot integration
-5. **Phase 5:** Auto-response (IP blocking/reporting)
-
-## Notes
-
-- Start small and iterate.
-- Validate all attack simulations only in your own lab/local environment.
-- Keep architecture modular so each team can work independently.
